@@ -1,16 +1,17 @@
 package com.microservice.rest;
 
 import com.microservice.beans.Credentials;
+import org.apache.commons.io.Charsets;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,11 +35,14 @@ public class GatewayController {
 
         Process p = pb.start();
         InputStreamReader isr = new InputStreamReader(p.getInputStream());
-        char[] buf = new char[1024];
-        while (isr.read(buf) != -1) {
-            System.out.println(buf);
-        }
 
-        return ResponseEntity.ok(new HashMap());
+        StringWriter writer = new StringWriter();
+        IOUtils.copy(isr, writer);
+        String output = writer.toString();
+
+        Map<String,Object> result = new HashMap<>();
+        result.put("data", output);
+
+        return ResponseEntity.ok(result);
     }
 }
