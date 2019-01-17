@@ -1,6 +1,8 @@
 package com.microservice.rest;
 
-import com.microservice.beans.Credentials;
+import com.google.gson.Gson;
+import com.microservice.config.Credentials;
+import com.microservice.dto.SetExpressCheckoutDto;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,17 +16,23 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 public class GatewayController {
 
     @Autowired
+    private Gson pretty;
+    
+    @Autowired
     private Credentials credentials;
 
-    @RequestMapping(value = "setExpressCheckout", method= RequestMethod.GET)
-    public ResponseEntity<Map> setExpressCheckout() throws IOException {
+    @RequestMapping(value = "setExpressCheckout", method= RequestMethod.POST,
+            consumes = {"application/json"})
+    public ResponseEntity<Map> setExpressCheckout(
+            @RequestBody SetExpressCheckoutDto setExpressCheckoutDto) throws IOException {
 
-        System.out.println("Running script");
+        System.out.println(pretty.toJson(setExpressCheckoutDto));
 
         ProcessBuilder pb = new ProcessBuilder("bash", "./scripts/setExpressCheckout.sh");
 
